@@ -93,6 +93,59 @@ SMODS.Atlas({
     py = 95
 })
 
+SMODS.Atlas({
+    key = "ohnepixel",
+    path = "j_ohnepixel.png",
+    px = 71,
+    py = 95
+})
+
+SMODS.Atlas({
+    key = "riolutm",
+    path = "j_riolutm.png",
+    px = 71,
+    py = 95
+})
+
+-- ohnePixel Joker
+-- 1 in 385 to get $661
+SMODS.Joker{
+    key = "ohnepixel",
+    pos = { x = 0, y = 0 },
+    rarity = 3,
+    blueprint_compat = true,
+    cost = 8,
+    discovered = true,
+    atlas = "ohnepixel",
+    config = { extra = { odds = 385, money = 661 } },
+    loc_vars = function(self, info_queue, card)
+    local numerator, denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.odds, 'vremade_bloodstone')
+    return {
+        vars = {
+            numerator,                  --#1#
+            denominator,                --#2#
+            card.ability.extra.money    --#3#
+        }
+    }
+    end,
+    calculate = function(self, card, context)
+        if context.joker_main then
+            if SMODS.pseudorandom_probability(card, 'vremade_ohnepixel', 1 , card.ability.extra.odds) then
+                return {
+                    message = localize('k_gold'),
+                    colour = G.C.MONEY,
+                    ease_dollars(card.ability.extra.money)
+                }
+            end
+        end
+    end,
+    loc_txt = {
+        name = "ohnePixel",
+        text = {
+            "{C:green,s:1.1}#1# in #2#{} chance to get {C:gold,s:1.1}$#3#{}",
+        },
+    }
+}
 
 SMODS.Joker{
     key = "sample_wee",                                  --name used by the joker.    
