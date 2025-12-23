@@ -23,6 +23,22 @@ function return_JokerValues() -- not used, just here to demonstrate how you coul
     end
 end
 
+SMODS.Sound {
+    key = 'sj_ohnejimboscore',
+    path = 'ohnejimboscore.ogg'
+}
+
+SMODS.Atlas {
+	-- Key for code to find it with
+	key = "ohnejimbo",
+	-- The name of the file, for the code to pull the atlas from
+	path = "ohne.png",
+	-- Width of each sprite in 1x size
+	px = 71,
+	-- Height of each sprite in 1x size
+	py = 95
+}
+
 SMODS.Atlas({
     key = "sample_wee",
     path = "j_sample_wee.png",
@@ -417,5 +433,40 @@ SMODS.Joker{
 
     loc_vars = function(self, info_queue, card)
         return { vars = { card.ability.extra.chips, card.ability.extra.mult }, key = self.key }
+    end
+}
+
+SMODS.Joker {
+    key = "ohnejimbo",
+    pos = { x = 0, y = 0 },
+    rarity = 3,
+    blueprint_compat = true,
+    cost = 8,
+    discovered = true,
+    atlas = "ohnejimbo",
+    config = { extra = { mult = 385 }, },
+    loc_txt = {
+        name = "ohnePixel",
+        text = {
+            "{C:red,s:1.1}+#1#{} Mult",
+        },
+    },
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card.ability.extra.mult } }
+    end,
+    calculate = function(self, card, context)
+        if context.joker_main then
+        return {
+            mult = card.ability.extra.mult,
+            func = function()
+    G.E_MANAGER:add_event(Event({
+        func = function()
+            play_sound('sj_ohnejimboscore')
+            return true
+        end
+    }))
+end
+        }
+        end
     end
 }
