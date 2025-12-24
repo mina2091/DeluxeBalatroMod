@@ -47,6 +47,27 @@ SMODS.Atlas({
 })
 
 SMODS.Atlas({
+    key = "oopsno6s",
+    path = "nosixes.png",
+    px = 71,
+    py = 95,
+})
+
+SMODS.Atlas({
+    key = "hytale",
+    path = "hytale.png",
+    px = 71,
+    py = 95,
+})
+
+SMODS.Atlas({
+    key = "estrogen",
+    path = "estrogen.png",
+    px = 71,
+    py = 95,
+})
+
+SMODS.Atlas({
     key = "sj_sample_obelisk",
     path = "j_sample_obelisk.png",
     px = 71,
@@ -464,5 +485,71 @@ end
     end 
 }
 
+SMODS.Joker {
+    key = "estrogen",
+    pos = { x = 0, y = 0 },
+    rarity = 3,
+    blueprint_compat = false,
+    cost = 8,
+    discovered = true,
+    atlas = "estrogen",
+    loc_txt = {
+        name = "Estrogen",
+        text = {
+            "After {C:attention}#1#{} rounds",
+            "sell this card to",
+            "turn your Jacks into Queens",
+            "{C:inactive}(Currently {C:attention}#2#/#1#){}"
+        }
+    },
+config = { extra = { invis_rounds = 0, total_rounds = 2,  }},
+    calculate = function(self, card, context)
+    end
+} --for later
 
+SMODS.Joker {
+    key = "hytale",
+    pos = { x = 0, y = 0 },
+    rarity = 2,
+    blueprint_compat = true,
+    cost = 8,
+    discovered = true,
+    atlas = "hytale",
+     config = { extra = { rounds = 0, target = 5, x_mult = 5 } },
+     loc_txt = {
+        name = "Hytale",
+        text = {
+    
+        }
+    } --for later
+}
 
+SMODS.Joker {
+key = "oopsno6s",  
+pos = { x = 0, y = 0 },
+    unlocked = true,
+    blueprint_compat = false,
+    rarity = 2,
+    cost = 4,
+    discovered = true,
+    atlas = "oopsno6s",
+     loc_txt = {
+        name = "Oops No 6s",
+        text = {
+            "{C:green}1 in 0#{} chance for probabilities to occur",
+        }
+    },
+    calculate = function(self, card, context)
+        if context.mod_probability and not context.blueprint then
+            return {
+                numerator = 0
+            }
+        end
+    end,
+    locked_loc_vars = function(self, info_queue, card)
+        return { vars = { number_format(10000) } }
+    end,
+    check_for_unlock = function(self, args)                      -- equivalent to `unlock_condition = { type = 'chip_score', chips = 10000 }`
+        return args.type == 'chip_score' and args.chips >= 10000 -- See note about Talisman on the wiki
+    end
+}
