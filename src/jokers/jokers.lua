@@ -1,4 +1,4 @@
-
+﻿
 -- you can have shared helper functions
 function shakecard(self) --visually shake a card
     G.E_MANAGER:add_event(Event({
@@ -107,6 +107,93 @@ SMODS.Atlas({
     py = 95
 })
 
+SMODS.Atlas({
+    key = "krimbo",
+    path = "j_krimbo.png",
+    px = 71,
+    py = 95
+})
+
+SMODS.Atlas({
+    key = "toiletananasnasdas",
+    path = "j_toiletananasnasdas.png",
+    px = 71,        
+    py = 95
+})
+
+-- Toilet Ananas Nasdas Joker
+-- Add current hour to Mult and Minute to Chips
+SMODS.Joker{
+    key = "toiletananasnasdas",
+    pos = { x = 0, y = 0 },
+    rarity = 2,
+    blueprint_compat = true,
+    cost = 6,
+    discovered = true,
+    atlas = "toiletananasnasdas",
+    loc_vars = function(self, info_queue, card)
+        local time = os.date("*t")
+        return {
+            vars = {
+                time.hour,    --#1#
+                time.min      --#2#
+            }
+        }
+    end,
+    calculate = function(self, card, context)
+        if context.joker_main then
+            local time = os.date("*t")
+            return {
+                mult = time.hour,
+                chips = time.min,
+                colour = G.C.CHIPS
+            }
+        end
+    end,
+    loc_txt = {
+        name = "Toilet Ananas Nasdas",
+        text = {
+            "Add current {C:chips,s:1.1}Minute{} to Chips",
+            "and current {C:red,s:1.1}Hour{} to Mult",
+            "{C:inactive}(Currently {C:chips}+#2#{C:inactive} Chips, {C:red}+#1#{C:inactive} Mult)"
+        },
+    }
+}
+
+-- Krimbo Joker
+-- x4 Mult
+SMODS.Joker{
+    key = "krimbo",
+    pos = { x = 0, y = 0 },
+    rarity = 3,
+    blueprint_compat = true,
+    cost = 7,
+    discovered = true,
+    atlas = "krimbo",
+    config = { extra = { xmult = 4} },
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = {
+                card.ability.extra.xmult    --#1#
+            }
+        }
+    end,
+    calculate = function(self, card, context)
+        if context.joker_main then
+            return {
+                x_mult = card.ability.extra.xmult,
+                colour = G.C.RED
+            }
+        end
+    end,
+    loc_txt = {
+        name = "Krimbo",
+        text = {
+            "{C:red,s:1,1}X#1#{} Mult",
+        },
+    }
+}
+
 -- Gimbo Joker
 -- +4 Chips 
 SMODS.Joker{
@@ -153,7 +240,7 @@ SMODS.Joker{
     atlas = "ohnepixel",
     config = { extra = { odds = 385, money = 661 } },
     loc_vars = function(self, info_queue, card)
-    local numerator, denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.odds, 'vremade_bloodstone')
+    local numerator, denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.odds, 'vremade_ohnepixel')
     return {
         vars = {
             numerator,                  --#1#
@@ -166,7 +253,7 @@ SMODS.Joker{
         if context.joker_main then
             if SMODS.pseudorandom_probability(card, 'vremade_ohnepixel', 1 , card.ability.extra.odds) then
                 return {
-                    message = localize('k_gold'),
+                    message = localize('k_gold'),       --todo: change to "gold gold gold"
                     colour = G.C.MONEY,
                     ease_dollars(card.ability.extra.money)
                 }
