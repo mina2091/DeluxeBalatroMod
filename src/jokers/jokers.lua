@@ -42,9 +42,6 @@ SMODS.Atlas {
 SMODS.Atlas({
     key = "roffle",
     path = "looksinside.png",
-    loc_txt = {
-        name = 'Double Exposure',
-        },
     px = 71,
     py = 95,
 })
