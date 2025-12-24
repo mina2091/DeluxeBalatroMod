@@ -101,11 +101,45 @@ SMODS.Atlas({
 })
 
 SMODS.Atlas({
-    key = "riolutm",
-    path = "j_riolutm.png",
+    key = "gimbo",
+    path = "j_gimbo.png",
     px = 71,
     py = 95
 })
+
+-- Gimbo Joker
+-- +4 Chips 
+SMODS.Joker{
+    key = "gimbo",
+    pos = { x = 0, y = 0 },
+    rarity = 1,
+    blueprint_compat = true,
+    cost = 2,
+    discovered = true,
+    atlas = "gimbo",
+    config = { extra = { chips = 4 } },
+    loc_vars = function(self, info_queue, card)
+        return {
+            vars = {
+                card.ability.extra.chips    --#1#
+            }
+        }
+    end,
+    calculate = function(self, card, context)
+        if context.joker_main then
+            return {
+                chips = card.ability.extra.chips,
+                colour = G.C.CHIPS
+            }
+        end
+    end,
+    loc_txt = {
+        name = "Gimbo",
+        text = {
+            "{C:chips,s:1.1}+#1#{} Chips",
+        },
+    }
+}
 
 -- ohnePixel Joker
 -- 1 in 385 to get $661
