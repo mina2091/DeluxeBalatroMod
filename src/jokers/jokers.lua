@@ -496,16 +496,52 @@ SMODS.Joker {
     loc_txt = {
         name = "Estrogen",
         text = {
-            "After {C:attention}#1#{} rounds",
+            "After {C:attention}#2#{} rounds",
             "sell this card to",
             "turn your Jacks into Queens",
-            "{C:inactive}(Currently {C:attention}#2#/#1#){}"
+            "{C:inactive}(Currently {C:attention}#1#/#2#){}"
         }
     },
-config = { extra = { invis_rounds = 0, total_rounds = 2,  }},
+config = { extra = { invis_rounds = 0, total_rounds = 2 }},
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card.ability.extra.invis_rounds, card.ability.extra.total_rounds} }
+    end,
     calculate = function(self, card, context)
+        if context.end_of_round and not context.blueprint and not (context.individual or context.repetition) then
+            card.ability.extra.invis_rounds = card.ability.extra.invis_rounds + 1
+            if card.ability.extra.invis_rounds >= card.ability.extra.total_rounds then
+                return {
+                    message = localize('k_active_ex'),
+                    colour = G.C.FILTER
+                }
+            end
+        end
+        if context.selling_self and card.ability.extra.invis_rounds >= card.ability.extra.total_rounds then
+            G.E_MANAGER:add_event(Event({
+                trigger = 'after',
+                delay = 0.4,
+                func = function()
+                    local suit_map = {Spades = 'S', Hearts = 'H', Diamonds = 'D', Clubs = 'C'}
+                    local transformed = false
+                    
+                    for k, v in ipairs(G.playing_cards) do
+                        if v and v.config and v:get_id() == 11 then
+                            local s_char = suit_map[v.base.suit] or string.sub(v.base.suit, 1, 1)
+                            local target_key = s_char .. '_Q'
+                            
+                            if G.P_CARDS[target_key] then
+                                v:set_base(G.P_CARDS[target_key])
+                                v:juice_up()
+                                transformed = true
+                            end
+                        end
+                    end
+                    return true
+                end
+            }))
+        end
     end
-} --for later
+}
 
 SMODS.Joker {
     key = "hytale",
@@ -515,13 +551,45 @@ SMODS.Joker {
     cost = 8,
     discovered = true,
     atlas = "hytale",
-     config = { extra = { rounds = 0, target = 5, x_mult = 5 } },
+     config = {
+        extra = {
+            xmult = 5,
+		    every = 2,
+		    turns_elapsed = 0
+        }
+    },
      loc_txt = {
         name = "Hytale",
         text = {
-    
-        }
-    } --for later
+            "After {C:attention}#2#{} rounds (Progress: {C:attention}#3#/#2#{})",
+            "gain {X:mult,C:white} X#1# {} Mult"
+        },
+    },
+     loc_vars = function(self, info_queue, card)
+        return { vars = { card.ability.extra.xmult, card.ability.extra.every, card.ability.extra.turns_elapsed} }
+    end,
+    calculate = function(self, card, context)
+        if context.joker_main and card.ability.extra.turns_elapsed >= card.ability.extra.every then
+            return {
+                message = localize{type='variable', key='a_xmult', vars={card.ability.extra.xmult}},
+                Xmult_mod = card.ability.extra.xmult        
+            }
+        end
+        if context.end_of_round and not context.blueprint and not (context.individual or context.repetition) then
+            if card.ability.extra.turns_elapsed >= card.ability.extra.every then
+                card.ability.extra.turns_elapsed = 0 
+                return {
+                    message = "December 2018",
+                    colour = G.C.RED
+                }
+            else
+                card.ability.extra.turns_elapsed = card.ability.extra.turns_elapsed + 1
+                return {
+                    colour = G.C.ATTENTION
+                }
+            end
+        end
+    end
 }
 
 SMODS.Joker {
@@ -549,7 +617,7 @@ pos = { x = 0, y = 0 },
     locked_loc_vars = function(self, info_queue, card)
         return { vars = { number_format(10000) } }
     end,
-    check_for_unlock = function(self, args)                      -- equivalent to `unlock_condition = { type = 'chip_score', chips = 10000 }`
-        return args.type == 'chip_score' and args.chips >= 10000 -- See note about Talisman on the wiki
+    check_for_unlock = function(self, args)                      
+        return args.type == 'chip_score' and args.chips >= 10000
     end
 }
