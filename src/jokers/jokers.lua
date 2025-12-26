@@ -121,6 +121,58 @@ SMODS.Atlas({
     py = 95
 })
 
+SMODS.Atlas({
+    key = "gamble90",
+    path = "j_gamble90.png",
+    px = 71,
+    py = 95
+})
+
+-- Gamble Joker 
+-- When sold, 1 in 3 chance to X10 money. If miss -> game over
+SMODS.Joker{
+    key = "gamble90",
+    pos = { x = 0, y = 0 },
+    rarity = 3,
+    blueprint_compat = true,
+    cost = 1,
+    discovered = true,
+    atlas = "gamble90",
+    config = { extra = { odds = 3, mult = 10} },
+    loc_vars = function(self, info_queue, card)
+    local numerator, denominator = SMODS.get_probability_vars(card, 1, card.ability.extra.odds, 'vremade_gamble90')
+    return {
+        vars = {
+            numerator,                  --#1#
+            denominator,                --#2#
+            card.ability.extra.mult     --#3#
+        }
+    }
+    end,
+    calculate = function(self, card, context)
+        if context.selling_self then
+            if SMODS.pseudorandom_probability(card, 'vremade_gamble90', 1, card.ability.extra.odds) then
+                ease_dollars(G.GAME.dollars*card.ability.extra.mult)
+            else
+                if G.STAGE == G.STAGES.RUN then
+                    G.STATE = G.STATES.GAME_OVER
+                    G.STATE_COMPLETE = false
+                end
+            remove_save()
+            end
+        end
+    end,
+    loc_txt = {
+        name = "90% Gambler Card",
+        text = {
+            "When sold, {C:green}#1# in #2#{} chance",
+            "to {C:gold}X#3#{} your current money.",
+            "If you miss, {C:attention}you lose the run{}"
+        },
+    }
+}
+
+
 -- Toilet Ananas Nasdas Joker
 -- Add current hour to Mult and Minute to Chips
 SMODS.Joker{
